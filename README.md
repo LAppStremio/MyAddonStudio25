@@ -1,4 +1,4 @@
-# 📺 OMG Premium TV per Stremio
+# 📺 MyAddonStudio25 (Stremio)
 
 ***[🇮🇹 Leggi in italiano](README.md)*** - ***[🇬🇧 Read in English](README-EN.md)*** - ***[🇫🇷 Lire en Français](README-FR.md)*** - ***[🇪🇸 Leer en español](README-ES.md)***
 
