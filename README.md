@@ -2,7 +2,7 @@
 
 ***[🇮🇹 Leggi in italiano](README.md)*** - ***[🇬🇧 Read in English](README-EN.md)*** - ***[🇫🇷 Lire en Français](README-FR.md)*** - ***[🇪🇸 Leer en español](README-ES.md)***
 
-<img width="1440" alt="Screenshot 2025-02-28 alle 21 36 52" src="https://github.com/user-attachments/assets/c85b2a33-0174-4cb3-b7a9-2cc2140c8c0f" />
+<img width="1440" alt="Screenshot 2025-02-28 alle 21 36 52" src="https://github.com/LAppStremio/MyAddonStudio25/blob/main/tv.png?raw=true" />
 
 ## 👋 Introduzione
 
