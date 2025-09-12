@@ -268,7 +268,7 @@ text-decoration: none;
 
          ${showConfigFields ?
 `
-                  <label>URL:</label>
+                  <label>URL: EXEMPLO- (http://amis.lol:80/playlist/66666/88888/m3u_plus)</label>
                   <input type="url" name="m3u"
                          value="${query.m3u || ''}"
 
@@ -597,4 +597,5 @@ host)}
 
 module.exports = {
 renderConfigPage
+
 };
