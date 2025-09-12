@@ -109,7 +109,7 @@ async function catalogHandler({ type, id, extra, config: userConfig }) {
                 poster: channel.poster || fallbackLogo,
                 background: channel.background || fallbackLogo,
                 logo: channel.logo || fallbackLogo,
-                description: channel.description || `Canale: ${channel.name} - ID: ${channel.streamInfo?.tvg?.id}`,
+                description: channel.description || `Canal: ${channel.name} - ID: ${channel.streamInfo?.tvg?.id}`,
                 genre: channel.genre,
                 posterShape: channel.posterShape || 'square',
                 releaseInfo: 'LIVE',
@@ -149,7 +149,7 @@ async function catalogHandler({ type, id, extra, config: userConfig }) {
 
 function enrichWithEPG(meta, channelId, userConfig) {
     if (!userConfig.epg_enabled || !channelId) {
-        meta.description = `Canale live: ${meta.name}`;
+        meta.description = `Canal live: ${meta.name}`;
         meta.releaseInfo = 'LIVE';
         return meta;
     }
@@ -158,7 +158,7 @@ function enrichWithEPG(meta, channelId, userConfig) {
     const upcomingPrograms = EPGManager.getUpcomingPrograms(normalizeId(channelId));
 
     if (currentProgram) {
-        meta.description = `IN ONDA ORA:\n${currentProgram.title}`;
+        meta.description = `A VER AGORA:\n${currentProgram.title}`;
 
         if (currentProgram.description) {
             meta.description += `\n${currentProgram.description}`;
