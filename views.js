@@ -268,13 +268,13 @@ text-decoration: none;
 
          ${showConfigFields ?
 `
-                  <label>URL: EXEMPLO- (http://amis.lol:80/playlist/66666/88888/m3u_plus)</label>
+                  <label>URL:(http://amis.lol:80/playlist/66666/88888/m3u_plus)</label>
                   <input type="url" name="m3u"
                          value="${query.m3u || ''}"
 
 required>
 
-                  <label>URL do EPG:</label>
+                  <label>URL do EPG: (http://ami.lol:80/xmltv.php?username=6666&password=9999)</label>
                   <input type="url" name="epg" value="${query.epg || ''}">
 
 
@@ -599,3 +599,4 @@ module.exports = {
 renderConfigPage
 
 };
+
