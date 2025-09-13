@@ -311,7 +311,7 @@ def resolve_link(url, headers=None, channel_name=None):
     - Un dizionario con l'URL risolto e gli header da utilizzare
     """
     print(f"Risoluzione URL: {url}")
-    print(f"Canale: {channel_name}")
+    print(f"Canal: {channel_name}")
     
     # Parsing dell'URL per estrarre parametri
     parsed_url = urlparse(url)
