@@ -56,11 +56,22 @@ const getViewScripts = (protocol, host) => {
         }
 
         function proceedInstallation() {
-            const configQueryString = getConfigQueryString();
-            const configBase64 = btoa(configQueryString);
-            window.location.href = \`stremio://${host}/\${configBase64}/manifest.json\`;
-            document.getElementById('confirmModal').style.display = 'none';
-        }
+    document.getElementById('confirmModal').style.display = 'none';
+
+    // Obtém o URL do manifesto da div na página
+    const manifestUrlElement = document.querySelector('.manifest-url');
+    const manifestUrl = manifestUrlElement ? manifestUrlElement.innerText.replace('URL Manifest:', '').trim() : '';
+
+    if (manifestUrl) {
+        // Codifica o URL para garantir que é seguro
+        const installUrl = `stremio://install?url=${encodeURIComponent(manifestUrl)}`;
+
+        // Redireciona o navegador para o URL de instalação do Stremio
+        window.location.href = installUrl;
+    } else {
+        alert('Erro: URL do manifesto não encontrado.');
+    }
+}
 
         function installAddon() {
             showConfirmModal();
