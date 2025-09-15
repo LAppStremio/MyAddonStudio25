@@ -1,4 +1,4 @@
-﻿const fs = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 const baseConfig = {
@@ -22,75 +22,65 @@ const baseConfig = {
        description: 'Modalita provvisoria, installazione con errori, attivo mod. provvisoria',
        logo: 'https://github.com/LAppStremio/MyAddonStudio25/blob/main/tv.png?raw=true',
        resources: ['stream', 'catalog', 'meta'],
-       types: ['tv'],
-       idPrefixes: ['tv'],
-       catalogs: [
-           {
-               type: 'tv',
-               id: 'omg_tv',
-               name: 'MyAddonStudio25', // ESTE SERÁ SOBRESCRITO PELA LÓGICA DE customConfig.addonName
-               extra: [
-                   {
-                       name: 'genre',
-                       isRequired: false,
-                       options: []  // Verrà popolato dinamicamente dai generi della playlist
-                   },
-                   {
-                       name: 'search',
-                       isRequired: false
-                   },
-                   {
-                       name: 'skip',
-                       isRequired: false
-                   }
-               ]
-           }
-       ],
+       types: ['tv', 'movie'],
+       idPrefixes: ['tt', 'tv'],
        behaviorHints: {
-           // --- ALTERAÇÃO AQUI (PRIMEIRA OCORRÊNCIA) ---
-           configurable: false, // Alterado de true para false para remover o ícone de definições
-           // --- FIM DA ALTERAÇÃO ---
-           configurationURL: null,  // Verrà impostato dinamicamente
+           // ALTERAÇÃO FINAL E CRUCIAL
+           configurable: false,
+           configurationURL: `http://localhost:${process.env.PORT || 10000}/?access_code=${process.env.ACCESS_CODE}`,
            reloadRequired: true
-       }
+       },
+       catalogs: [{
+           id: 'omg-tv-catalog',
+           name: 'OMGTV',
+           type: 'tv',
+           genres: [],
+           extra: [
+               {
+                   name: 'genre',
+                   isRequired: false,
+                   options: []
+               },
+               {
+                   name: 'search',
+                   isRequired: false
+               },
+               {
+                   name: 'skip',
+                   isRequired: false
+               }
+           ]
+       }]
    }
 };
 
 function loadCustomConfig() {
-   const configOverridePath = path.join(__dirname, 'addon-config.json');
-   
    try {
-       const addonConfigExists = fs.existsSync(configOverridePath);
+       const configPath = path.join(__dirname, 'addon-config.json');
+       if (fs.existsSync(configPath)) {
+           console.log('Caricamento configurazione personalizzata...');
+           const customConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
-       if (addonConfigExists) {
-           const customConfig = JSON.parse(fs.readFileSync(configOverridePath, 'utf8'));
-           
            const mergedConfig = {
                ...baseConfig,
+               ...customConfig,
                manifest: {
                    ...baseConfig.manifest,
-                   id: customConfig.addonId || baseConfig.manifest.id,
-                   name: customConfig.addonName || baseConfig.manifest.name,
-                   description: customConfig.addonDescription || baseConfig.manifest.description,
-                   version: customConfig.addonVersion || baseConfig.manifest.version,
-                   logo: customConfig.addonLogo || baseConfig.manifest.logo,
+                   ...customConfig.manifest,
                    behaviorHints: {
-                       // --- ALTERAÇÃO AQUI (SEGUNDA OCORRÊNCIA) ---
-                       ...baseConfig.manifest.behaviorHints, // Mantenha isso para herdar outras hints
-                       configurable: false, // Definido explicitamente como false aqui também
-                       // --- FIM DA ALTERAÇÃO ---
-                       configurationURL: null,  // Verrà impostato dinamicamente
-                       reloadRequired: true
+                       ...baseConfig.manifest.behaviorHints,
+                       ...customConfig.manifest.behaviorHints
                    },
                    catalogs: [{
                        ...baseConfig.manifest.catalogs[0],
-                       id: customConfig.catalogId || (customConfig.addonId ? customConfig.addonId + '_catalog' : baseConfig.manifest.catalogs[0].id), // Se quiser ID diferente para o catálogo
-                       name: customConfig.addonName || baseConfig.manifest.catalogs[0].name, // << AQUI ESTÁ A ALTERAÇÃO CRUCIAL
+                       ...customConfig.manifest.catalogs[0],
+                       id: customConfig.catalogId || (customConfig.addonId ? customConfig.addonId + '_catalog' : baseConfig.manifest.catalogs[0].id),
+                       name: customConfig.addonName || baseConfig.manifest.catalogs[0].name,
                        extra: [
                            {
                                name: 'genre',
                                isRequired: false,
-                               options: []  // Verrà popolato dinamicamente dai generi della playlist
+                               options: []
                            },
                            {
                                name: 'search',
