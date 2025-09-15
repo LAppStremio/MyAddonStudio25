@@ -1,4 +1,4 @@
-/**
+7/**
  * Restituisce tutto il codice JavaScript per i controlli della pagina di configurazione
  * @param {string} protocol - Il protocollo HTTP/HTTPS in uso
  * @param {string} host - L'hostname del server
@@ -70,8 +70,7 @@ const getViewScripts = (protocol, host) => {
         window.location.href = installUrl;
     } else {
         alert('Erro: URL do manifesto não encontrado.');
-    }
-}
+        }
 
         function installAddon() {
             showConfirmModal();
