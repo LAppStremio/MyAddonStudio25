@@ -58,7 +58,7 @@ const baseConfig = {
 
                id: 'omg_tv',
 
-               name: '📺 MyTv', // ESTE SERÁ SOBRESCRITO PELA LÓGICA DE customConfig.addonName
+               name: '📺 MyNewTv', // ESTE SERÁ SOBRESCRITO PELA LÓGICA DE customConfig.addonName
 
                extra: [
 
@@ -233,3 +233,4 @@ function loadCustomConfig() {
 const config = loadCustomConfig();
 
 module.exports = config;
+
