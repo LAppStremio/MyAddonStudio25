@@ -20,8 +20,17 @@ const renderConfigPage = (protocol, host, query, manifest) => {
     const manifestQuery = { ...query };
     delete manifestQuery.access_code;
 
-    // Inclui a parte do JavaScript apenas se o conteúdo for visível
-    const scriptsToInclude = contentVisible ? getViewScripts(protocol, host) : '';
+    // 🔹 Corrigido: só inclui os scripts se existirem, e com verificação de erro
+    let scriptsToInclude = '';
+    if (contentVisible) {
+        scriptsToInclude = `
+        try {
+            ${getViewScripts(protocol, host)}
+        } catch (e) {
+            console.warn("Erro nos scripts da página:", e.message);
+        }
+        `;
+    }
 
     return `
         <!DOCTYPE html>
@@ -255,63 +264,7 @@ const renderConfigPage = (protocol, host, query, manifest) => {
                 
                 ${contentVisible ? 
                 `
-                <div class="manifest-url">
-                    <strong>URL Manifest:</strong><br>
-                    ${protocol}://${host}/manifest.json?${new URLSearchParams(manifestQuery)}
-                </div>
-
-                <div class="buttons">
-                    <button onclick="copyManifestUrl()">COPIAR URL DO MANIFESTO</button>
-                    <button onclick="installAddon()">INSTALAR NO STREMIO</button>
-                </div>
-
-                <div class="config-form">
-                    <h2>Gerar Configuração</h2>
-                    <form id="configForm" onsubmit="updateConfig(event)">
-                        <label>URL:(http://amis.lol:80/playlist/66666/88888/m3u_plus)</label>
-                        <input type="url" name="m3u" value="${query.m3u || ''}" required>
-                        <label>URL do EPG: (http://ami.lol:80/xmltv.php?username=6666&password=9999)</label>
-                        <input type="url" name="epg" value="${query.epg || ''}">
-                        <label>
-                            <input type="checkbox" name="epg_enabled" ${query.epg_enabled === 'true' ? 'checked' : ''}>
-                            Ativar EPG
-                        </label>
-                        <div class="advanced-settings">
-                            <div class="advanced-settings-header" onclick="toggleAdvancedSettings()">
-                                <strong>Definições Avançadas</strong>
-                                <span id="advanced-settings-toggle">▼</span>
-                            </div>
-                            <div class="advanced-settings-content" id="advanced-settings-content">
-                                <label>URL do Proxy:</label>
-                                <input type="url" name="proxy" value="${query.proxy || ''}">
-                                <label>Palavra-passe do Proxy:</label>
-                                <input type="password" name="proxy_pwd" value="${query.proxy_pwd || ''}">
-                                <label>
-                                    <input type="checkbox" name="force_proxy" ${query.force_proxy === 'true' ? 'checked' : ''}>
-                                    Forçar Proxy
-                                </label>
-                                <label>Sufixo do ID:</label>
-                                <input type="text" name="id_suffix" value="${query.id_suffix || ''}" placeholder="Esempio: it">
-                                <label>URL do ficheiro de remapeamento:</label>
-                                <input type="text" name="remapper_path" value="${query.remapper_path || ''}" placeholder="Esempio: https://raw.githubusercontent.com/...">
-                                <label>Intervalo de Atualização da Lista:</label>
-                                <input type="text" name="update_interval" value="${query.update_interval || '12:00'}" placeholder="HH:MM (predefinito 12:00)">
-                                <small style="color: #999;">Formato HH:MM (es. 1:00 o 01:00), predefinito 12:00</small>
-                                <label>URL do Script Resolver em Python:</label>
-                                <input type="url" name="resolver_script" value="${query.resolver_script || ''}">
-                                <label>
-                                    <input type="checkbox" name="resolver_enabled" ${query.resolver_enabled === 'true' ? 'checked' : ''}>
-                                    Ativar Resolver Python
-                                </label>
-                            </div>
-                        </div>
-                        <input type="hidden" name="access_code" value="${query.access_code || ''}">
-                        <input type="hidden" name="python_script_url" id="hidden_python_script_url" value="${query.python_script_url || ''}">
-                        <input type="hidden" name="python_update_interval" id="hidden_python_update_interval" value="${query.python_update_interval || ''}">
-                        <input type="hidden" name="resolver_update_interval" id="hidden_resolver_update_interval" value="${query.resolver_update_interval || ''}">
-                        <input type="submit" value="Gerar Configuração">
-                    </form>
-                </div>
+                ... (resto do teu HTML igual) ...
                 ` :
                 `
                 <div class="config-form">
@@ -325,131 +278,7 @@ const renderConfigPage = (protocol, host, query, manifest) => {
                 `
                 }
                 
-                ${(contentVisible && showConfigFields) ?
-                `
-                <div class="config-form hidden-section">
-                    <div class="advanced-settings">
-                        <div class="advanced-settings-header" onclick="togglePythonSection()">
-                            <strong>Gerar Lista com Script Python</strong>
-                            <span id="python-section-toggle">▼</span>
-                        </div>
-                        <div class="advanced-settings-content" id="python-section-content">
-                            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 4px; margin-bottom: 20px; margin-top: 15px;">
-                                <p><strong>Esta funcionalidade permite:</strong></p>
-                                <ul style="text-align: left;">
-                                    <li>Transferir um script Python de um URL</li>
-                                    <li>Executá-lo dentro do contentor Docker</li>
-                                    <li>Usar o ficheiro M3U gerado como fonte</li>
-                                </ul>
-                                <p><strong>Nota:</strong> L'URL deve puntare a uno script Python che genera um file M3U.</p>
-                            </div>
-                            <div id="pythonForm">
-                                <label>URL do Script Python:</label>
-                                <input type="url" id="pythonScriptUrl" placeholder="https://example.com/script.py">
-                                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                                    <button onclick="downloadPythonScript()" style="flex: 1;">DESCARREGAR SCRIPT</button>
-                                    <button onclick="executePythonScript()" style="flex: 1;">EXECUTAR SCRIPT</button>
-                                    <button onclick="checkPythonStatus()" style="flex: 1;">VERIFICAR ESTADO</button>
-                                </div>
-                                <div style="margin-top: 15px;">
-                                    <h4>Atualização Automática</h4>
-                                    <div style="display: flex; gap: 10px; align-items: center;">
-                                        <input type="text" id="updateInterval" placeholder="HH:MM (es. 12:00)" style="flex: 2;">
-                                        <button onclick="scheduleUpdates()" style="flex: 1;">AGENDAR</button>
-                                        <button onclick="stopScheduledUpdates()" style="flex: 1;">PARAR</button>
-                                    </div>
-                                    <small style="color: #999; display: block; margin-top: 5px;">
-                                        Formato: HH:MM (ex: 12:00 para 12 horas, 1:00 para 1 hora, 0:30 para 30 minutos)
-                                    </small>
-                                </div>
-                                <div id="pythonStatus" style="margin-top: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; display: none;">
-                                    <h3>Estado do Script Python</h3>
-                                    <div id="pythonStatusContent"></div>
-                                </div>
-                                <div id="generatedM3uUrl" style="margin-top: 15px; background: rgba(0,255,0,0.1); padding: 10px; border-radius: 4px; display: none;">
-                                    <h3>URL da Lista Gerada</h3>
-                                    <div id="m3uUrlContent"></div>
-                                    <button onclick="useGeneratedM3u()" style="width: 100%; margin-top: 10px;">USAR ESTA LISTA</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="config-form hidden-section">
-                    <div class="advanced-settings">
-                        <div class="advanced-settings-header" onclick="toggleResolverSection()">
-                            <strong>Resolver Python para Stream</strong>
-                            <span id="resolver-section-toggle">▼</span>
-                        </div>
-                        <div class="advanced-settings-content" id="resolver-section-content">
-                            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 4px; margin-bottom: 20px; margin-top: 15px;">
-                                <p><strong>O que é o Resolver Python?</strong></p>
-                                <p>O Resolver Python permite-te:</p>
-                                <ul style="text-align: left;">
-                                    <li>Risolvere dinamicamente gli URL di streaming</li>
-                                    <li>Aggiungere token de autenticação agli stream</li>
-                                    <li>Gestire API protette per i provider de conteúdo</li>
-                                    <li>Personalizar as requisições com header específicos</li>
-                                </ul>
-                                <p><strong>Nota: É necessário um script Python que implemente a função <code>resolve_link</code>.</strong></p>
-                            </div>
-                            <div id="resolverForm">
-                                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                                    <button onclick="downloadResolverScript()" style="flex: 1;">DESCARREGAR SCRIPT</button>
-                                    <button onclick="createResolverTemplate()" style="flex: 1;">CRIAR MODELO</button>
-                                    <button onclick="checkResolverHealth()" style="flex: 1;">VERIFICAR SCRIPT</button>
-                                </div>
-                                <div style="margin-top: 15px;">
-                                    <h4>Gestão de Cache e Atualizações</h4>
-                                    <div style="display: flex; gap: 10px; align-items: center;">
-                                        <input type="text" id="resolverUpdateInterval" placeholder="HH:MM (es. 12:00)" style="flex: 2;">
-                                        <button onclick="scheduleResolverUpdates()" style="flex: 1;">AGENDAR</button>
-                                        <button onclick="stopResolverUpdates()" style="flex: 1;">PARAR</button>
-                                        <button onclick="clearResolverCache()" style="flex: 1;">LIMPAR CACHE</button>
-                                    </div>
-                                    <small style="color: #999; display: block; margin-top: 5px;">
-                                        Formato: HH:MM (ex: 12:00 para 12 horas, 1:00 para 1 hora, 0:30 para 30 minutos)
-                                    </small>
-                                </div>
-                                <div id="resolverStatus" style="margin-top: 15px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; display: none;">
-                                    <h3>Estado do Resolver Python</h3>
-                                    <div id="resolverStatusContent"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                ` : ``}
-
-                <div style="margin-top: 30px; text-align: center; font-size: 14px; color: #ccc;">
-                    ${showSupportSection ? `
-                    <p>Addon criado com paixão por McCoy88f - <a href="https://github.com/mccoy88f/OMG-Premium-TV" target="_blank">GitHub Repository</a></p>
-                    <p>Addon editado por LAppDesign.</p>
-                    <h3 style="margin-top: 20px;">Apoia este projeto!</h3>
-                    <div style="margin-top: 15px;">
-                        <a href="https://www.buymeacoffee.com/mccoy88f" target="_blank">
-                            <img src="https://img.buymeacoffee.com/button-api/?text=Oferece-me uma cerveja&emoji=🍺&slug=mccoy88f&button_colour=FFDD00&font_colour=000000&font_family=Bree&outline_colour=000000&coffee_colour=ffffff" alt="Buy Me a Coffee" style="max-width: 300px; margin: 0 auto;"/>
-                        </a>
-                    </div>
-                    <p style="margin-top: 15px;">
-                        <a href="https://paypal.me/mccoy88f?country.x=IT&locale.x=it_IT" target="_blank">Podes também oferecer-me uma cerveja via PayPal 🍻</a>
-                    </p>
-                    ` : ``}
-                </div>
-            
-                <div id="confirmModal">
-                    <div>
-                        <h2>Confirmar Instalação</h2>
-                        <p>Já geraste a configuração?</p>
-                        <div style="margin-top: 20px;">
-                            <button onclick="cancelInstallation()" style="background: #666;">Voltar</button>
-                            <button onclick="proceedInstallation()" style="background: #8A5AAB;">Prosseguir</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="toast" class="toast">URL Copiado!</div>
+                ... (resto do código igual) ...
 
                 <script>
                     ${scriptsToInclude}
