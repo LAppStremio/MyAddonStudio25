@@ -70,11 +70,12 @@ const getViewScripts = (protocol, host) => {
         window.location.href = installUrl;
     } else {
         alert('Erro: URL do manifesto não encontrado.');
-        }
+    }
+}
 
-        function installAddon() {
-            showConfirmModal();
-        }
+function installAddon() {
+    showConfirmModal();
+}
 
         function updateConfig(e) {
             e.preventDefault();
