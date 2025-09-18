@@ -23,7 +23,7 @@ function enrichWithDetailedEPG(meta, channelId, userConfig) {
     if (currentProgram) {
         let description = [];
         
-        description.push('📺 IN ONDA ORA:', currentProgram.title);
+        description.push('📺 Ver Agora:', currentProgram.title);
         
         if (currentProgram.description) {
             description.push('', currentProgram.description);
@@ -119,7 +119,7 @@ async function metaHandler({ type, id, config: userConfig }) {
         let baseDescription = [];
         
         if (channel.streamInfo?.tvg?.chno) {
-            baseDescription.push(`📺 Canale ${channel.streamInfo.tvg.chno}`);
+            baseDescription.push(`📺 Canal ${channel.streamInfo.tvg.chno}`);
         }
 
         if (channel.description) {
