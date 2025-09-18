@@ -357,7 +357,7 @@ async function streamHandler({ id, config: userConfig }) {
             poster: channel.poster || fallbackLogo,
             background: channel.background || fallbackLogo,
             logo: channel.logo || fallbackLogo,
-            description: channel.description || `ID Canale: ${channel.streamInfo?.tvg?.id}`,
+            description: channel.description || `ID Canal: ${channel.streamInfo?.tvg?.id}`,
             genre: channel.genre,
             posterShape: channel.posterShape || 'square',
             releaseInfo: 'LIVE',
