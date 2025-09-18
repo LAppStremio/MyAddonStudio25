@@ -36,7 +36,7 @@ const baseConfig = {
 
        id: 'org.mccoy88f.omgtv',
 
-       version: '2.3.0',
+       version: '2.4.0',
 
        name: '📺 MyTv',
 
@@ -233,4 +233,5 @@ function loadCustomConfig() {
 const config = loadCustomConfig();
 
 module.exports = config;
+
 
