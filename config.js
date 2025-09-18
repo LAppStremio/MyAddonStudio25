@@ -38,7 +38,7 @@ const baseConfig = {
 
        version: '2.4.0',
 
-       name: '📺 MyTv',
+       name: '✨MyTv',
 
        description: 'Modalita provvisoria, installazione con errori, attivo mod. provvisoria',
 
@@ -58,7 +58,7 @@ const baseConfig = {
 
                id: 'omg_tv',
 
-               name: '📺 MyTV', // ESTE SERÁ SOBRESCRITO PELA LÓGICA DE customConfig.addonName
+               name: '✨MyTV', // ESTE SERÁ SOBRESCRITO PELA LÓGICA DE customConfig.addonName
 
                extra: [
 
@@ -233,6 +233,7 @@ function loadCustomConfig() {
 const config = loadCustomConfig();
 
 module.exports = config;
+
 
 
 
